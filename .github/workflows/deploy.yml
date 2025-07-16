@@ -1,0 +1,55 @@
+# .github/workflows/deploy.yml
+name: Deploy WebServices to Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Name of the artifact to deploy'
+        required: true
+        type: string
+        default: "webservices"
+      version:
+        description: 'Version to deploy (e.g., 0.0.1)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      artifact:
+        description: 'Artifact to deploy'
+        required: true
+        type: string
+        default: "webservices"
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+jobs:
+  deploy_to_cloud_run:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for Google Workload Identity Federation
+      contents: read # Needed for actions/checkout if you include it, or other actions.
+
+    steps:
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }} # e.g., 'my-webservices'
+          # Use the input version, checking if it came from workflow_dispatch or workflow_call
+          image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}:${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}
+          region: ${{ secrets.GCP_CLOUD_RUN_REGION }} # e.g., 'us-central1'
+          allow_unauthenticated: true # Consider removing/securing this for production
+          # Optional: Specify a service account for the Cloud Run instance itself
+          # service_account_email: your-cloud-run-runtime-sa@sdcote.iam.gserviceaccount.com
+          # env_vars: |
+          #   SPRING_PROFILES_ACTIVE=prod
