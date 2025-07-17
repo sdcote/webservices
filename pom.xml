@@ -53,10 +53,12 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<!-- Common libraries needed for building web applications using Spring MVC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- Lombok annotations (@Getter, @Setter, etc.) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -68,16 +70,19 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.6.0</version> <!-- Check for the latest compatible version -->
 		</dependency>
+		<!-- A curated set of testing libraries for Spring Boot applications -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- JUnit5 test framework -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- JUnit5 API -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -87,6 +92,7 @@
 
 	<build>
 		<plugins>
+			<!-- Main Java compiler -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -99,6 +105,7 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<!-- Simplifies building, packaging, and running Spring Boot applications -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -115,7 +122,7 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.4.1</version> <!-- Use the latest stable version -->
+				<version>3.4.6</version> <!-- Use the latest stable version -->
 				<configuration>
 					<!-- Base image for your application -->
 					<from>
@@ -130,16 +137,6 @@
 					<tags>
 						<tag>latest</tag>
 					</tags>
-					<!-- Optional: Set up authentication for CI/CD if not using gcloud defaults.
-					     For local development with 'gcloud auth configure-docker', this block might not be needed.
-						 NOTE: Jib relies on the "GOOGLE_APPLICATION_CREDENTIALS" environment variable to point to the 
-						 location of a JSON key file on the file system. Otherwise, use the "auth" section to pass the 
-						 _contents_ of the JSON key file.
-					     NEVER hardcode credentials here. Use environment variables. -->
-					<auth>
-						<username>_json_key</username>
-						<password>${env.GOOGLE_BUILDER_KEY}</password>
-					</auth>
 				</configuration>
 				<executions>
 					<execution>
@@ -303,6 +300,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	
 	
 </project>

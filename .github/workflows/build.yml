@@ -1,4 +1,4 @@
-# Continuous Integration (CI) build and publish to Artifact Repository
+# Continuous Integration (CI) build and publish to GCP Artifact Registry
 
 name: Build
 
@@ -54,21 +54,16 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
-
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
         run: mvn -B -U clean install deploy --file pom.xml
         working-directory: ${{ github.workspace }}
-        env:
-          # Jib automatically uses Application Default Credentials from google-github-actions/auth
-          # No need for -Dmaven.deploy.skip=true as it's in pom.xml
-          # No need for GOOGLE_APPLICATION_CREDENTIALS environment variable here.
-          SPRING_PROFILES_ACTIVE: "github-actions" # Example: activate a specific Spring profile for CI builds
 
-      - name: Call Deploy Workflow (Continuous Deployment)
-        uses: ./.github/workflows/deploy.yml # Path to your reusable deploy workflow
-        with:
-          artifact: ${{ steps.get-version.outputs.ARTIFACT }} # Pass the name of the artifact to pull from the artifact registry
-          version: ${{ steps.get-version.outputs.VERSION }} # Pass the version of the artifact
-          secrets: inherit # Pass all secrets from this workflow to the called workflow
+# Commented-out while debugging GCP authentication
+#      - name: Call Deploy Workflow (Continuous Deployment)
+#        uses: ./.github/workflows/deploy.yml # Path to your reusable deploy workflow
+#        with:
+#          artifact: ${{ steps.get-version.outputs.ARTIFACT }} # Pass the name of the artifact to pull from the artifact registry
+#          version: ${{ steps.get-version.outputs.VERSION }} # Pass the version of the artifact
+#          secrets: inherit # Pass all secrets from this workflow to the called workflow
 
