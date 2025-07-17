@@ -32,6 +32,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Debug GitHub Repository Context
+        run: |
+          echo "GitHub Repository Owner: ${{ github.repository_owner }}"
+          echo "GitHub Repository Name: ${{ github.event.repository.name }}"
+          echo "GitHub Repository Full: ${{ github.repository }}" 
+          echo "GitHub Ref (Branch/Tag): ${{ github.ref }}"
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
