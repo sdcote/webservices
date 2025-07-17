@@ -69,7 +69,7 @@ jobs:
 
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
-        run: mvn -B -U clean install deploy --file pom.xml
+        run: mvn -B -U -X clean install deploy --file pom.xml
         working-directory: ${{ github.workspace }}
 
 # Commented-out while debugging GCP authentication
