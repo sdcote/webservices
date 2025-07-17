@@ -50,7 +50,7 @@ jobs:
       - name: Get Maven project artifact
         id: get-artifact
         run: |
-          ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifact -q -DforceStdout)
+          ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           echo "ARTIFACT=$ARTIFACT" >> $GITHUB_OUTPUT
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
