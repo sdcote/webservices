@@ -47,6 +47,12 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
+      - name: Verify Authenticated GCP Identity
+        run: gcloud auth list --format="yaml"
+        # Optional: Add another to see current project
+      - name: Verify Current GCP Project
+        run: gcloud config get-value project
+        
       - name: Get Maven project artifact
         id: get-artifact
         run: |
@@ -63,7 +69,7 @@ jobs:
 
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
-        run: mvn -B -U clean install deploy --file pom.xml
+        run: mvn -B -U -X clean install deploy --file pom.xml
         working-directory: ${{ github.workspace }}
 
 # Commented-out while debugging GCP authentication
