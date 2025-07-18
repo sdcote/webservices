@@ -48,7 +48,7 @@ jobs:
           # Use the input version, checking if it came from workflow_dispatch or workflow_call
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}:${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}
           region: ${{ secrets.GCP_CLOUD_RUN_REGION }} # e.g., 'us-central1'
-          allow_unauthenticated: true # Consider removing/securing this for production
+          # allow_unauthenticated: true # Consider removing/securing this for production
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: your-cloud-run-runtime-sa@sdcote.iam.gserviceaccount.com
           # env_vars: |

@@ -122,18 +122,14 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.4.6</version> <!-- Use the latest stable version -->
+				<version>3.4.6</version>
 				<configuration>
-					<!-- Base image for your application -->
 					<from>
 						<image>openjdk:21-jdk-slim</image>
 					</from>
-					<!-- Target image in GCP Artifact Registry -->
-					<!-- IMPORTANT: Replace YOUR_GCP_PROJECT_ID, YOUR_ARTIFACT_REGISTRY_REPO, and YOUR_IMAGE_NAME -->
 					<to>
-						<image>us-east5-docker.pkg.dev/sdcote/docker/${project.artifactId}:${project.version}</image>
+                        <image>us-east5-docker.pkg.dev/sdcote/docker/${project.artifactId}:${project.version}</image>
 					</to>
-					<!-- Optional: Define additional tags for the image -->
 					<tags>
 						<tag>latest</tag>
 					</tags>
@@ -141,7 +137,7 @@
 				<executions>
 					<execution>
 						<id>build-and-push-image</id>
-						<phase>deploy</phase> <!-- Or 'install' if you prefer to push earlier -->
+						<phase>deploy</phase>
 						<goals>
 							<goal>build</goal>
 						</goals>

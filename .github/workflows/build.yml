@@ -89,7 +89,7 @@ jobs:
           # It uses a system property, which Maven passes to the JVM.
           JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
           # Keep other env vars if they are needed for your application
-          # SPRING_PROFILES_ACTIVE: "github-actions"
+          SPRING_PROFILES_ACTIVE: "github-actions"
 
 # Commented-out while debugging GCP authentication
 #      - name: Call Deploy Workflow (Continuous Deployment)
