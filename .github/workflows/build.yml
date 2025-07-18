@@ -98,14 +98,11 @@ jobs:
         run: |
           # Use 'mvn help:system' to print all system properties
           # Redirect output to a file, and print file content to logs
-          mvn help:system -DoutputFile=system-properties.txt -f pom.xml
-          echo "--- System Properties ---"
-          cat system-properties.txt
-          echo "--- End System Properties ---"
+          mvn help:system -DoutputFile=system-properties.txt --f pom.xml
         working-directory: ${{ github.workspace }}
         env:
           # IMPORTANT: For this debug step, we must pass the variable so 'mvn help:system' sees it.
-          JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_GHA_CREDS_PATH }}
 
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
@@ -114,6 +111,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         env:
           # Keep this here for the actual build step's execution
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_GHA_CREDS_PATH }}
           SPRING_PROFILES_ACTIVE: "github-actions"
 
 # Commented-out while debugging GCP authentication
