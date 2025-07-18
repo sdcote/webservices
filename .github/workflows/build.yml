@@ -109,7 +109,8 @@ jobs:
 
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
-        run: mvn -B -U -X clean install deploy --file pom.xml
+        #run: mvn -B -U -X clean install deploy --file pom.xml
+        run: mvn -B -U -X clean install deploy -Djib.google.credentials.file=${{ env.GOOGLE_GHA_CREDS_PATH }} --file pom.xml
         working-directory: ${{ github.workspace }}
         env:
           # This tells Jib directly where to find the service account key file.
