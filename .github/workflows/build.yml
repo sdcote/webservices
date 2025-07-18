@@ -60,6 +60,33 @@ jobs:
         env:
           GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
+      - name: Verify JIB_GOOGLE_CREDENTIALS_FILE Path
+        run: |
+          echo "Value of JIB_GOOGLE_CREDENTIALS_FILE: '${{ env.JIB_GOOGLE_CREDENTIALS_FILE }}'"
+          # Verify the GOOGLE_GHA_CREDS_PATH env variable itself
+          echo "Value of GOOGLE_GHA_CREDS_PATH: '${{ env.GOOGLE_GHA_CREDS_PATH }}'"
+
+      - name: Check Credential File Existence and Content
+        # !!! CAUTION: This will print part of your credential file to logs.
+        # !!! ONLY FOR DEBUGGING. REMOVE IMMEDIATELY AFTER USE.
+        run: |
+          CRED_PATH="${{ env.JIB_GOOGLE_CREDENTIALS_FILE }}"
+          echo "--- Checking file at: ${CRED_PATH} ---"
+          ls -l "${CRED_PATH}" # Check existence, permissions
+          file "${CRED_PATH}" # Check file type (should be JSON text)
+          echo "--- First 10 lines of file: ---"
+          head -n 10 "${CRED_PATH}" # Print first few lines to confirm JSON
+          echo "--- Last 10 lines of file: ---"
+          tail -n 10 "${CRED_PATH}" # Print last few lines
+          echo "--- End of file check ---"
+        # Remove this step after a single debug run!
+
+      - name: Build and push Docker image
+        run: mvn -B -U -X clean install deploy --file pom.xml
+        working-directory: ${{ github.workspace }}
+        env:
+          JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
+          SPRING_PROFILES_ACTIVE: "github-actions"
       - name: Verify Authenticated GCP Identity
         run: gcloud auth list --format="yaml"
         # Optional: Add another to see current project
