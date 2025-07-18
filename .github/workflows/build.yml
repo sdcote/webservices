@@ -92,11 +92,27 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
+      - name: Verify Maven System Properties
+        run: |
+          # Use 'mvn help:system' to print all system properties
+          # Redirect output to a file, and print file content to logs
+          mvn help:system -DoutputFile=system-properties.txt -f pom.xml
+          echo "--- System Properties ---"
+          cat system-properties.txt
+          echo "--- End System Properties ---"
+        working-directory: ${{ github.workspace }}
+        env:
+          # IMPORTANT: For this debug step, we must pass the variable so 'mvn help:system' sees it.
+          JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
+
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
         # run: mvn -B -U clean install deploy --file pom.xml
         run: mvn -B -U -X clean install deploy -Djib.google.credentials.file=${{ env.GOOGLE_GHA_CREDS_PATH }} --file pom.xml
         working-directory: ${{ github.workspace }}
+        env:
+          # Keep this here for the actual build step's execution
+          SPRING_PROFILES_ACTIVE: "github-actions"
 
 # Commented-out while debugging GCP authentication
 #      - name: Call Deploy Workflow (Continuous Deployment)
