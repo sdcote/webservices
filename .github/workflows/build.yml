@@ -66,18 +66,6 @@ jobs:
           # Verify the GOOGLE_GHA_CREDS_PATH env variable itself
           echo "Value of GOOGLE_GHA_CREDS_PATH: '${{ env.GOOGLE_GHA_CREDS_PATH }}'"
 
-      - name: Build and push Docker image
-        run: mvn -B -U -X clean install deploy --file pom.xml
-        working-directory: ${{ github.workspace }}
-        env:
-          JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
-          SPRING_PROFILES_ACTIVE: "github-actions"
-      - name: Verify Authenticated GCP Identity
-        run: gcloud auth list --format="yaml"
-        # Optional: Add another to see current project
-      - name: Verify Current GCP Project
-        run: gcloud config get-value project
-        
       - name: Get Maven project artifact
         id: get-artifact
         run: |
