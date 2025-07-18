@@ -111,7 +111,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         env:
           # Keep this here for the actual build step's execution
-          JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }}
+          # JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }} # this does not work
+          # Pass the secret content as an environment variable that Maven/Jib can read
+          GCP_SA_KEY_CONTENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON_KEY_CONTENT }}
           SPRING_PROFILES_ACTIVE: "github-actions"
 
 # Commented-out while debugging GCP authentication

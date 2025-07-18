@@ -122,7 +122,7 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.4.6</version>
 				<configuration>
 					<from>
 						<image>openjdk:21-jdk-slim</image>
@@ -133,6 +133,10 @@
 					<tags>
 						<tag>latest</tag>
 					</tags>
+					<credentials>
+                        <username>_json_key</username>
+                        <password>${env.GCP_SA_KEY_CONTENT}</password>
+                    </credentials>
 				</configuration>
 				<executions>
 					<execution>
