@@ -33,6 +33,9 @@ jobs:
       contents: read # Needed for actions/checkout if you include it, or other actions.
 
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
