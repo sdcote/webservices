@@ -57,6 +57,15 @@ jobs:
         env:
           GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
+      - name: Service Account Effective Policy Check
+        run: |
+          echo "--- Attempting to get IAM policy for service account from runner ---"
+          gcloud iam service-accounts get-iam-policy "${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" --project="${{ secrets.GCP_PROJECT_ID }}" --format="yaml" || echo "Failed to get service account policy (likely due to insufficient permissions for this operation)"
+          echo "--- End Service Account Effective Policy Check ---"
+        env:
+          GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
