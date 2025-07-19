@@ -1,5 +1,5 @@
 # .github/workflows/deploy.yml
-name: Deploy WebServices to Cloud Run
+name: Deploy
 
 on:
   workflow_dispatch:
@@ -50,6 +50,6 @@ jobs:
           region: ${{ secrets.GCP_CLOUD_RUN_REGION }} # e.g., 'us-central1'
           # allow_unauthenticated: true # Consider removing/securing this for production
           # Optional: Specify a service account for the Cloud Run instance itself
-          # service_account_email: your-cloud-run-runtime-sa@sdcote.iam.gserviceaccount.com
+          # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
           # env_vars: |
           #   SPRING_PROFILES_ACTIVE=prod
