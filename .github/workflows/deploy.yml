@@ -44,6 +44,19 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
+      - name: Test GCP Access Token with gcloud CLI
+        run: |
+          echo "--- Running gcloud auth print-access-token (default) ---"
+          gcloud auth print-access-token || echo "Failed to print default access token"
+          echo "--- Running gcloud auth print-access-token (impersonated) ---"
+          gcloud auth print-access-token --impersonate-service-account="${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" || echo "Failed to print impersonated access token"
+          echo "--- gcloud config list ---"
+          gcloud config list
+          echo "--- gcloud auth list ---"
+          gcloud auth list
+        env:
+          GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
