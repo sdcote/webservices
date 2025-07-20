@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.3</version>
+		<version>3.3.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sdcote</groupId>
@@ -57,6 +57,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- Spring Actuator to provide metrics and build info (e.g., version) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<!-- Lombok annotations (@Getter, @Setter, etc.) -->
 		<dependency>
@@ -117,6 +122,13 @@
 						</exclude>
 					</excludes>
 				</configuration>
+				<executions>
+                	<execution>
+                    	<goals>
+                        	<goal>build-info</goal>
+	                    </goals>
+    	            </execution>
+        	    </executions>
 			</plugin>
 			<!-- Jib Maven Plugin for Docker Image Build and Push to GCP Artifact Registry -->
 			<plugin>
