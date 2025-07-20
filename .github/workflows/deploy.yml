@@ -41,40 +41,17 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/gha-pool-webservices/providers/github-sdcote-webservices
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-
-      - name: Test GCP Access Token with gcloud CLI
-        run: |
-          echo "--- Running gcloud auth print-access-token (default) ---"
-          gcloud auth print-access-token || echo "Failed to print default access token"
-          echo "--- Running gcloud auth print-access-token (impersonated) ---"
-          gcloud auth print-access-token --impersonate-service-account="${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" || echo "Failed to print impersonated access token"
-          echo "--- gcloud config list ---"
-          gcloud config list
-          echo "--- gcloud auth list ---"
-          gcloud auth list
-        env:
-          GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-
-      - name: Service Account Effective Policy Check
-        run: |
-          echo "--- Attempting to get IAM policy for service account from runner ---"
-          gcloud iam service-accounts get-iam-policy "${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" --project="${{ secrets.GCP_PROJECT_ID }}" --format="yaml" || echo "Failed to get service account policy (likely due to insufficient permissions for this operation)"
-          echo "--- End Service Account Effective Policy Check ---"
-        env:
-          GCP_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }} # e.g., 'my-webservices'
-          # Use the input version, checking if it came from workflow_dispatch or workflow_call
+          service: ${{ github.event.inputs.service_name || github.event.workflow_call.inputs.service_name }}
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}:${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}
-          region: ${{ secrets.GCP_CLOUD_RUN_REGION }} # e.g., 'us-central1'
+          region: ${{ github.event.inputs.cloud_run_region || github.event.workflow_call.inputs.cloud_run_region }}  # e.g., 'us-central1'
+          # ... (other optional parameters)
           # allow_unauthenticated: true # Consider removing/securing this for production
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
-          # env_vars: |
-          #   SPRING_PROFILES_ACTIVE=prod
+
