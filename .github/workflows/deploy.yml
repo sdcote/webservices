@@ -14,6 +14,10 @@ on:
         required: true
         type: string
         default: "0.0.1"
+      service_name:
+        description: 'Cloud Run service name'
+        type: string
+        default: "core-api"
   workflow_call:
     inputs:
       artifact:
@@ -24,6 +28,10 @@ on:
         description: 'Version to deploy'
         required: true
         type: string
+      service_name:
+        description: 'Cloud Run service name'
+        type: string
+        default: "core-api"
 
 jobs:
   deploy:
@@ -44,10 +52,24 @@ jobs:
           workload_identity_provider: projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/gha-pool-webservices/providers/github-sdcote-webservices
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
+      - name: Show Workflow Call Inputs
+        run: |
+          echo "--- Workflow Dispatch Inputs ---"
+          echo "Artifact: ${{ github.event.workflow_dispatch.inputs.artifact }}"
+          echo "Version: ${{ github.event.workflow_dispatch.inputs.version }}"
+          echo "Service Name: ${{ github.event.workflow_dispatch.inputs.service_name }}"
+          echo "--- End Workflow Call Inputs ---"
+          echo "--- Workflow Call Inputs ---"
+          echo "Artifact: ${{ github.event.workflow_call.inputs.artifact }}"
+          echo "Version: ${{ github.event.workflow_call.inputs.version }}"
+          echo "Service Name: ${{ github.event.workflow_call.inputs.service_name }}"
+          echo "--- End Workflow Call Inputs ---"
+          echo "" # For a newline separator in logs
+
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: core-api
+          service: ${{ github.event.inputs.service_name || github.event.workflow_call.inputs.service_name }}
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}:${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}
           region: us-east5
           # Optional: Specify a service account for the Cloud Run instance itself
