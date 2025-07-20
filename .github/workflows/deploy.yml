@@ -55,9 +55,9 @@ jobs:
       - name: Show Workflow Call Inputs
         run: |
           echo "--- Workflow Dispatch Inputs ---"
-          echo "Artifact: ${{ github.event.workflow_dispatch.inputs.artifact }}"
-          echo "Version: ${{ github.event.workflow_dispatch.inputs.version }}"
-          echo "Service Name: ${{ github.event.workflow_dispatch.inputs.service_name }}"
+          echo "Artifact: ${{ github.event.inputs.inputs.artifact }}"
+          echo "Version: ${{ github.event.inputs.inputs.version }}"
+          echo "Service Name: ${{ github.event.inputs.inputs.service_name }}"
           echo "--- End Workflow Call Inputs ---"
           echo "--- Workflow Call Inputs ---"
           echo "Artifact: ${{ github.event.workflow_call.inputs.artifact }}"
