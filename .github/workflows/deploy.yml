@@ -16,7 +16,6 @@ on:
         default: "0.0.1"
       service_name:
         description: 'Cloud Run service name'
-        required: true
         type: string
         default: "core-api"
   workflow_call:
@@ -31,7 +30,6 @@ on:
         type: string
       service_name:
         description: 'Cloud Run service name'
-        required: true
         type: string
         default: "core-api"
 
