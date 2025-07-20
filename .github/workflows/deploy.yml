@@ -14,10 +14,6 @@ on:
         required: true
         type: string
         default: "0.0.1"
-      service_name:
-        description: 'Cloud Run service name'
-        type: string
-        default: "core-api"
   workflow_call:
     inputs:
       artifact:
@@ -28,10 +24,6 @@ on:
         description: 'Version to deploy'
         required: true
         type: string
-      service_name:
-        description: 'Cloud Run service name'
-        type: string
-        default: "core-api"
 
 jobs:
   deploy_to_cloud_run:
@@ -55,11 +47,9 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ github.event.inputs.service_name || github.event.workflow_call.inputs.service_name }}
+          service: core-api
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}:${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}
           region: us-east5
-          # ... (other optional parameters)
-          # allow_unauthenticated: true # Consider removing/securing this for production
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
 
