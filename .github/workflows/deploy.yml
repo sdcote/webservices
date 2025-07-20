@@ -33,7 +33,6 @@ on:
         description: 'Cloud Run service name'
         type: string
         default: "core-api"
-        required: true
 
 jobs:
   deploy:
