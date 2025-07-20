@@ -107,7 +107,7 @@ jobs:
       - name: Build and push Docker image
         # The 'deploy' phase will trigger Jib to build and push
         # run: mvn -B -U -X clean install deploy -Djib.google.credentials.file=${{ env.GOOGLE_GHA_CREDS_PATH }} --file pom.xml  # this does not work
-        run: mvn -B -U -X clean install deploy --file pom.xml
+        run: mvn -B -U clean install deploy --file pom.xml
         working-directory: ${{ github.workspace }}
         env:
           # Keep this here for the actual build step's execution
@@ -115,10 +115,10 @@ jobs:
           # GCP_SA_KEY_CONTENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON_KEY_CONTENT }} # this does not work
           SPRING_PROFILES_ACTIVE: "github-actions"
 
-      - name: Call Deploy Workflow (Continuous Deployment)
-        uses: ./.github/workflows/deploy.yml # Path to your reusable deploy workflow
-        with:
-          artifact: ${{ steps.get-version.outputs.ARTIFACT }} # Pass the name of the artifact to pull from the artifact registry
-          version: ${{ steps.get-version.outputs.VERSION }} # Pass the version of the artifact
-          secrets: inherit # Pass all secrets from this workflow to the called workflow
-
+  call-deploy-workflow:
+    needs: build # This ensures the 'build' job completes successfully first
+    uses: ./.github/workflows/deploy.yml # Correct syntax for calling a reusable workflow
+    with:
+      artifact: ${{ needs.build.outputs.built_artifact }}
+      version: ${{ needs.build.outputs.built_version }}
+    secrets: inherit # Pass all secrets from this workflow to the called workflow
