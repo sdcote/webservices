@@ -58,11 +58,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- Spring Actuator to provide metrics and build info (e.g., version) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
 		<!-- Lombok annotations (@Getter, @Setter, etc.) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
