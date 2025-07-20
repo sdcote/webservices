@@ -19,7 +19,7 @@ jobs:
     outputs:
       # Output the artifact and the version so they can be passed to the deploy workflow
       built_version: ${{ steps.get-version.outputs.VERSION }}
-      built_artifact: ${{ steps.get-version.outputs.ARTIFACT }}
+      built_artifact: ${{ steps.get-artifact.outputs.ARTIFACT }}
 
     steps:
       - name: Checkout source
