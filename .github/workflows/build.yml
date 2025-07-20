@@ -115,6 +115,15 @@ jobs:
           # GCP_SA_KEY_CONTENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON_KEY_CONTENT }} # this does not work
           SPRING_PROFILES_ACTIVE: "github-actions"
 
+      - name: Debug Build Job Outputs Before Call
+        run: |
+          echo "--- Build Job Outputs ---"
+          echo "ARTIFACT: '${{ steps.get-artifact.outputs.ARTIFACT }}'"
+          echo "VERSION: '${{ steps.get-version.outputs.VERSION }}'"
+          echo "Built Artifact (job output): '${{ needs.build.outputs.built_artifact }}'"
+          echo "Built Version (job output): '${{ needs.build.outputs.built_version }}'"
+          echo "--- End Build Job Outputs ---"
+
   deploy:
     needs: build # This ensures the 'build' job completes successfully first
     permissions:
