@@ -18,8 +18,8 @@ jobs:
 
     outputs:
       # Output the artifact and the version so they can be passed to the deploy workflow
-      built_version: ${{ steps.get-version.outputs.VERSION }}
-      built_artifact: ${{ steps.get-artifact.outputs.ARTIFACT }}
+      built_version: ${{ env.JOB_OUTPUT_VERSION }}
+      built_artifact: ${{ env.JOB_OUTPUT_ARTIFACT }}
 
     steps:
       - name: Checkout source
@@ -85,6 +85,7 @@ jobs:
         run: |
           ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           echo "ARTIFACT=$ARTIFACT" >> $GITHUB_OUTPUT
+          echo "JOB_OUTPUT_ARTIFACT=$ARTIFACT" >> $GITHUB_ENV
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
       - name: Get Maven project version
@@ -92,6 +93,7 @@ jobs:
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "JOB_OUTPUT_VERSION=$VERSION" >> $GITHUB_ENV # <--- ADD THIS LINE
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
       - name: Verify Maven System Properties
@@ -120,6 +122,8 @@ jobs:
           echo "--- Build Job Outputs ---"
           echo "ARTIFACT: '${{ steps.get-artifact.outputs.ARTIFACT }}'"
           echo "VERSION: '${{ steps.get-version.outputs.VERSION }}'"
+          echo "JOB_OUTPUT_ARTIFACT (from env): '${{ env.JOB_OUTPUT_ARTIFACT }}'"
+          echo "JOB_OUTPUT_VERSION (from env): '${{ env.JOB_OUTPUT_VERSION }}'"
           echo "Built Artifact (job output): '${{ needs.build.outputs.built_artifact }}'"
           echo "Built Version (job output): '${{ needs.build.outputs.built_version }}'"
           echo "--- End Build Job Outputs ---"
