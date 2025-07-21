@@ -26,6 +26,7 @@ on:
         type: string
       service_name:
         type: string
+        default: "core-api"
 
 jobs:
   job1:
@@ -50,3 +51,8 @@ jobs:
           echo "Service Name: ${{ github.event.workflow_call.inputs.service_name }}"
           echo "--- End Workflow Call Inputs ---"
           echo "" # For a newline separator in logs
+          echo "--- Should Never Be Empty ---"
+          echo "Artifact: ${{ github.event.inputs.artifact || github.event.workflow_call.inputs.artifact }}"
+          echo "Version: ${{ github.event.inputs.version || github.event.workflow_call.inputs.version }}"
+          echo "Service Name: ${{ github.event.inputs.service_name || github.event.workflow_call.inputs.service_name }}"
+          echo "--- End Workflow Call Inputs ---"
