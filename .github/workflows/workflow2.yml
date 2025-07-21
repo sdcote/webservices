@@ -21,17 +21,11 @@ on:
   workflow_call:
     inputs:
       artifact:
-        description: 'Artifact to deploy'
         type: string
-        default: "webservices"
       version:
-        description: 'Version to deploy'
         type: string
-        default: "0.0.1"
       service_name:
-        description: 'Cloud Run service name'
         type: string
-        default: "core-api"
 
 jobs:
   job1:
