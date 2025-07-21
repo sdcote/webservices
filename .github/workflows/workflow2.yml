@@ -1,0 +1,58 @@
+
+name: Workflow2
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Name of the artifact to deploy'
+        required: true
+        type: string
+        default: "webservices"
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+        default: "0.0.1"
+      service_name:
+        description: 'Cloud Run service name'
+        type: string
+        default: "core-api"
+  workflow_call:
+    inputs:
+      artifact:
+        description: 'Artifact to deploy'
+        type: string
+        default: "webservices"
+      version:
+        description: 'Version to deploy'
+        type: string
+        default: "0.0.1"
+      service_name:
+        description: 'Cloud Run service name'
+        type: string
+        default: "core-api"
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Needed for actions/checkout if you include it, or other actions.
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Show Workflow Call Inputs
+        run: |
+          echo "--- Workflow Dispatch Inputs ---"
+          echo "Artifact: ${{ github.event.inputs.artifact }}"
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Service Name: ${{ github.event.inputs.service_name }}"
+          echo "--- End Workflow Dispatch Inputs ---"
+          echo "--- Workflow Call Inputs ---"
+          echo "Artifact: ${{ github.event.workflow_call.inputs.artifact }}"
+          echo "Version: ${{ github.event.workflow_call.inputs.version }}"
+          echo "Service Name: ${{ github.event.workflow_call.inputs.service_name }}"
+          echo "--- End Workflow Call Inputs ---"
+          echo "" # For a newline separator in logs
