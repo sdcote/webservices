@@ -1,6 +1,22 @@
 name: Workflow2
 
 on:
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Name of the artifact to deploy'
+        required: true
+        type: string
+        default: "webservices"
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+        default: "0.0.1"
+      service_name:
+        description: 'Cloud Run service name'
+        type: string
+        default: "core-api"
   workflow_call:
     inputs:
       artifact:
