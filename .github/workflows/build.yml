@@ -18,8 +18,8 @@ jobs:
 
     outputs:
       # Output the artifact and the version so they can be passed to the deploy workflow
-      built_version: ${{ env.JOB_OUTPUT_VERSION }}
-      built_artifact: ${{ env.JOB_OUTPUT_ARTIFACT }}
+      built_version: ${{ steps.get-version.outputs.VERSION }}
+      built_artifact: ${{ steps.get-artifact.outputs.ARTIFACT }}
 
     steps:
       - name: Checkout source
@@ -45,7 +45,6 @@ jobs:
         run: |
           ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           echo "ARTIFACT=$ARTIFACT" >> $GITHUB_OUTPUT
-          echo "JOB_OUTPUT_ARTIFACT=$ARTIFACT" >> $GITHUB_ENV
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
       - name: Get Maven project version
@@ -53,17 +52,12 @@ jobs:
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "JOB_OUTPUT_VERSION=$VERSION" >> $GITHUB_ENV # <--- ADD THIS LINE
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
       - name: Build and push Docker image
-        # The 'deploy' phase will trigger Jib to build and push
         run: mvn -B -U clean install deploy --file pom.xml
         working-directory: ${{ github.workspace }}
         env:
-          # Keep this here for the actual build step's execution
-          # JIB_GOOGLE_CREDENTIALS_FILE: ${{ env.GOOGLE_GHA_CREDS_PATH }} # this does not work
-          # GCP_SA_KEY_CONTENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON_KEY_CONTENT }} # this does not work
           SPRING_PROFILES_ACTIVE: "github-actions"
 
       - name: Debug Build Job Outputs Before Call
@@ -71,8 +65,6 @@ jobs:
           echo "--- Build Job Outputs ---"
           echo "ARTIFACT: '${{ steps.get-artifact.outputs.ARTIFACT }}'"
           echo "VERSION: '${{ steps.get-version.outputs.VERSION }}'"
-          echo "JOB_OUTPUT_ARTIFACT (from env): '${{ env.JOB_OUTPUT_ARTIFACT }}'"
-          echo "JOB_OUTPUT_VERSION (from env): '${{ env.JOB_OUTPUT_VERSION }}'"
           echo "--- End Build Job Outputs ---"
 
   deploy:
