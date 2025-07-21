@@ -55,22 +55,16 @@ jobs:
       - name: Show Workflow Call Inputs
         run: |
           echo "--- Workflow Dispatch Inputs ---"
-          echo "Artifact: ${{ github.event.inputs.artifact }}"
-          echo "Version: ${{ github.event.inputs.version }}"
-          echo "Service Name: ${{ github.event.inputs.service_name }}"
+          echo "Artifact: ${{ inputs.artifact }}"
+          echo "Version: ${{ inputs.version }}"
+          echo "Service Name: ${{ inputs.service_name }}"
           echo "--- End Workflow Dispatch Inputs ---"
-          echo "--- Workflow Call Inputs ---"
-          echo "Artifact: ${{ github.event.workflow_call.inputs.artifact }}"
-          echo "Version: ${{ github.event.workflow_call.inputs.version }}"
-          echo "Service Name: ${{ github.event.workflow_call.inputs.service_name }}"
-          echo "--- End Workflow Call Inputs ---"
-          echo "" # For a newline separator in logs
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ github.event.workflow_call.inputs.service_name || github.event.inputs.service_name }}
-          image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.workflow_call.inputs.artifact || github.event.inputs.artifact }}:${{ github.event.workflow_call.inputs.version || github.event.inputs.version }}
+          service: ${{ inputs.service_name }}
+          image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ inputs.artifact }}:${{ inputs.version }}
           region: us-east5
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
