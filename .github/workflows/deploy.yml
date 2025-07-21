@@ -69,8 +69,8 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ github.event.workflow_call.inputs.service_name }}
-          image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.workflow_call.inputs.artifact }}:${{ github.event.workflow_call.inputs.version }}
+          service: ${{ github.event.workflow_call.inputs.service_name || github.event.inputs.service_name }}
+          image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ github.event.workflow_call.inputs.artifact || github.event.inputs.artifact }}:${{ github.event.workflow_call.inputs.version || github.event.inputs.version }}
           region: us-east5
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
