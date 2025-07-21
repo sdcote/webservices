@@ -66,5 +66,11 @@ jobs:
           service: ${{ inputs.service_name }}
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ inputs.artifact }}:${{ inputs.version }}
           region: us-east5
+          # Allow public traffic, 5 min timeout, Route all traffic to the latest deployed revision
+          flags:  >
+            --allow-unauthenticated 
+            --timeout 300 
+            --to-latest
+          #  --env-vars=MY_ENV_VAR=hello,ANOTHER_VAR=world
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
