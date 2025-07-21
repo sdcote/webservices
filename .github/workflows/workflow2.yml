@@ -11,6 +11,9 @@ on:
         description: 'The project version'
         required: true
         type: string
+      service_name:
+        type: string
+        default: "core-api"
 
 jobs:
   # ... jobs in workflow2.yml that use the inputs ...
@@ -21,3 +24,4 @@ jobs:
         run: |
           echo "Received artifact: ${{ inputs.artifact }}"
           echo "Received version: ${{ inputs.version }}"
+          echo "Service name: ${{ inputs.service_name }}"
