@@ -8,6 +8,9 @@
 # all the appropriate buid, deploy and test steps. This prevents developers from building something locally and deploying it 
 # without the appropriate checks and approvals.
 #
+# This allows for "push button" deployment of any previously published version into any environment. It is a simple matter to 
+# conduct A/B testing between two environment, or to roll-back to a previous version if necessary.
+#
 
 name: Deploy
 

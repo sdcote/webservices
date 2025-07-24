@@ -89,7 +89,7 @@ jobs:
 #    with:
 #      artifact: ${{ needs.build.outputs.built_artifact }}
 #      version: ${{ needs.build.outputs.built_version }}
-#      environment: TEST
+#      environment: DEV
 #
 #  deploy_test:
 #    needs: deploy_dev
@@ -114,3 +114,15 @@ jobs:
 #      artifact: ${{ needs.build.outputs.built_artifact }}
 #      version: ${{ needs.build.outputs.built_version }}
 #      environment: QA
+#
+# deploy_prod:
+#    needs: deploy_qa
+#    permissions:
+#      id-token: write
+#      contents: read
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
+#    with:
+#      artifact: ${{ needs.build.outputs.built_artifact }}
+#      version: ${{ needs.build.outputs.built_version }}
+#      environment: PROD
