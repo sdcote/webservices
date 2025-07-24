@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class VersionController {
 
     private final BuildProperties buildProperties;
+    private static final String ENVIRONMENT_PROPERTY_STRING = "ENVIRON";
 
     @Autowired
     public VersionController(BuildProperties buildProperties) {
@@ -20,6 +21,10 @@ public class VersionController {
 
     @GetMapping("/version")
     public String getVersion() {
-        return "Component Version: " + buildProperties.getVersion();
+        StringBuilder builder = new StringBuilder("Component Version: ");
+        builder.append(buildProperties.getVersion());
+        builder.append("  Environment: ");
+        builder.append(System.getProperty(ENVIRONMENT_PROPERTY_STRING));
+        return  builder.toString() ;
     }
 }

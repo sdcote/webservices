@@ -30,6 +30,8 @@
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<skipUTs>false</skipUTs> <!-- Always run Unit Tests unless asked not to -->
+		<skipITs>true</skipITs> <!-- Only run Integration Tests when specifically asked -->
 		<surefire.version>3.5.3</surefire.version>
 		<jacoco.version>0.8.13</jacoco.version>
 		<spotbugs.version>4.9.3.2</spotbugs.version>
@@ -157,6 +159,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${surefire.version}</version>
 				<configuration>
+                    <skip>${skipUTs}</skip> <!-- Should UnitTests be skipped? -->
 					<includes>
 						<include>**/Test*.java</include>
 						<include>**/*Test.java</include>
@@ -169,6 +172,28 @@
 					</properties>
 				</configuration>
 			</plugin>
+			<!-- Maven Integration Tests -->
+			<plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-failsafe-plugin</artifactId>
+    	        <version>3.5.3</version>
+				<configuration>
+                    <skipITs>${skipITs}</skipITs> <!-- Should IntegrationTests be skipped? -->
+					<includes>
+                    	<include>**/*IT.java</include>
+						<include>**/IT*.java</include>
+						<include>**/*ITCase.java</include>
+					</includes>
+				</configuration>
+				<executions>
+        	        <execution>
+            	        <goals>
+                	        <goal>integration-test</goal>
+                    	    <goal>verify</goal>
+	                    </goals>
+    	            </execution>
+        	    </executions>
+        	</plugin>
 			<!-- Generate reports, including test coverage and code analysis -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

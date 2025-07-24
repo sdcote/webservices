@@ -1,4 +1,14 @@
-# .github/workflows/deploy.yml
+# Continuous Deployment (CD) of an artifact to a specific environment. On successful deployment, system tests are run.
+
+#
+# This deployment is parameterized to ensure the same deployment steps are performed in each of the execution environments. In this 
+# case, a Docker image is deployed into a Google Cloud Platform Cloud Run instance using a "builder" service account that has read 
+# access to the GCP artifact registry and deployment access to GCP Cloud Run. This helps ensure that only authorized accounts can 
+# access and deploy the artifact. This helps maintain the integrity of the execution environment. All deployments must pass through
+# all the appropriate buid, deploy and test steps. This prevents developers from building something locally and deploying it 
+# without the appropriate checks and approvals.
+#
+
 name: Deploy
 
 on:
@@ -18,6 +28,15 @@ on:
         description: 'Cloud Run service name'
         type: string
         default: "core-api"
+      environment:
+        description: 'Execution environment to run'
+        type: choice
+        options:
+          - DEV
+          - TEST
+          - QA
+          - PROD
+        default: "PROD"
   workflow_call:
     inputs:
       artifact:
@@ -32,6 +51,10 @@ on:
         description: 'Cloud Run service name'
         type: string
         default: "core-api"
+      environment:
+        description: 'Execution environment to run'
+        type: string
+        default: "prod"
 
 jobs:
   deploy:
@@ -44,6 +67,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4.2.2
 
+      # This uses GCP Workload Identity Federation (WIF) for Authentication and Authorization management
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
@@ -57,20 +81,72 @@ jobs:
           echo "--- Workflow Dispatch Inputs ---"
           echo "Artifact: ${{ inputs.artifact }}"
           echo "Version: ${{ inputs.version }}"
+          echo "Environment: ${{ inputs.environment }}"
           echo "Service Name: ${{ inputs.service_name }}"
           echo "--- End Workflow Dispatch Inputs ---"
 
+      #
+      # This is where we can conditionally execute different deployments based on the contents of the `environment` input variable. 
+      # Ideally, all these steps will look the same with minor changes relating to the execution environment. For example, lower 
+      # environments might run is different regions and zones and have different environment variables set for configuration.
+      #
+
       - name: Deploy to Cloud Run
+        if: ${{ inputs.environment == 'PROD' }}
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ inputs.service_name }}
           image: ${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ inputs.artifact }}:${{ inputs.version }}
           region: us-east5
-          # Allow public traffic, 5 min timeout, Route all traffic to the latest deployed revision
+          # Allow public traffic, 5 min timeout, Route all traffic to the latest deployed revision, set environment variables
           flags:  >
             --allow-unauthenticated 
             --timeout 300 
             --to-latest
-          #  --env-vars=MY_ENV_VAR=hello,ANOTHER_VAR=world
+            --env-vars=MY_ENV_VAR=hello,ANOTHER_VAR=world,ENVIRON=${{ inputs.environment }}
           # Optional: Specify a service account for the Cloud Run instance itself
           # service_account_email: webservices-sa@sdcote.iam.gserviceaccount.com
+
+      - name: Run TEST Deployment
+        if: ${{ inputs.environment == 'TEST' }}
+        run: |
+          echo "Deploying to TEST environment..."
+          # Add your TEST deployment commands here
+          echo "TEST deployment complete!"
+
+      - name: Run QA Deployment
+        if: ${{ inputs.environment == 'QA' }}
+        run: |
+          echo "Deploying to QA environment..."
+          # Add your QA deployment commands here
+          echo "QA deployment complete!"
+
+      - name: Run DEV Deployment
+        if: ${{ inputs.environment == 'DEV' }}
+        run: |
+          echo "Deploying to DEV environment..."
+          # Add your DEV deployment commands here
+          echo "DEV deployment complete!"
+
+      #
+      # This is where we can conditionally execute different tests suites based on the contents of the `environment` input variable. 
+      #
+      # If the integration tests contain tags that match the environment (e.g., `@Tag("QA")`), then we can use the environment 
+      # variable to call integration tests appropriate for that environment.
+      #
+      # The properties control what tests are are run: `-DskipTests` is a universal property honored by both Surefire and Failsafe. 
+      # By setting it, you explicitly tell Surefire to skip any unit tests that would normally run during the test phase, and also 
+      # reinforce that Failsafe should skip its tests.
+      #
+      # Since the `groups` system property is set, all the tests can use different test data depending on the group being run. If
+      # the tests are running with the `groups` set to "QA", then the QA configurations and test data can be used. If the `groups` 
+      # property is null, it can be assumed that the build is running on a developers local workstation and only those tests with 
+      # no tags are to be run and a local configuration (maybe a local config file) be run. NOTE: if you do not provide `-Dgroups=`
+      # as a filtering tag, ALL integration tests will be run. So you should always provide a filtering tag to explicity control 
+      # which integration tests to run.
+      #
+      - name: System Test
+        run: mvn clean verify -Dgroups=${{ inputs.environment }} -DskipITs=false -DskipUTs=true --file pom.xml
+        working-directory: ${{ github.workspace }}
+        env:
+          SPRING_PROFILES_ACTIVE: "github-actions"

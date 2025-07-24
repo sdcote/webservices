@@ -325,3 +325,19 @@ Now that the core functionality is working, you can consider refining your setup
       * Ensure your application has robust health checks configured so Cloud Run can correctly determine when a new revision is ready to receive traffic.
 
 You've built a strong foundation. Continue iterating and adding features as your application matures\! Well done\!
+
+
+
+
+
+```yaml
+      - name: Debug Build Job Outputs Before Call
+        run: |
+          echo "--- Build Job Outputs ---"
+          echo "ARTIFACT: '${{ steps.get-artifact.outputs.ARTIFACT }}'"
+          echo "VERSION: '${{ steps.get-version.outputs.VERSION }}'"
+          echo "--- End Build Job Outputs ---"
+
+
+```
+

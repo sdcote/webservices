@@ -1,4 +1,4 @@
-# Continuous Integration (CI) build and publish to GCP Artifact Registry
+# Continuous Integration (CI) build and publish to the artifact repository. On successful build and publish, the reusable deployment workflow is called.
 
 name: Build
 
@@ -54,20 +54,14 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         working-directory: ${{ github.workspace }} # Ensure maven is run from the project root
 
+      # Build and deploy the image to our docker registry, skipping integration tests
       - name: Build and push Docker image
-        run: mvn -B -U clean install deploy --file pom.xml
+        run: mvn -B -U clean install deploy -DskipITs --file pom.xml
         working-directory: ${{ github.workspace }}
         env:
           SPRING_PROFILES_ACTIVE: "github-actions"
 
-      - name: Debug Build Job Outputs Before Call
-        run: |
-          echo "--- Build Job Outputs ---"
-          echo "ARTIFACT: '${{ steps.get-artifact.outputs.ARTIFACT }}'"
-          echo "VERSION: '${{ steps.get-version.outputs.VERSION }}'"
-          echo "--- End Build Job Outputs ---"
-
-  deploy:
+  deploy_prod:
     needs: build
     permissions:
       id-token: write # Allow the called workflow to request OIDC tokens
@@ -77,3 +71,46 @@ jobs:
     with:
       artifact: ${{ needs.build.outputs.built_artifact }}
       version: ${{ needs.build.outputs.built_version }}
+      environment: PROD # Initially deploy into the PROD environment (for this demo)
+
+# In an environment with several lower environments, this build workflow can have several jobs each depending on the successful 
+# completion of the deployment (and test) of previous deployments into lower environments.
+#
+# It is not a good idea to use a workflow matrix here as a matrix will spawn multiple parallel jobs and we need to make sure the 
+# lower environments pass before deploying to a higher environment.
+#
+#  deploy_dev:
+#    needs: build
+#    permissions:
+#      id-token: write
+#      contents: read
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
+#    with:
+#      artifact: ${{ needs.build.outputs.built_artifact }}
+#      version: ${{ needs.build.outputs.built_version }}
+#      environment: TEST
+#
+#  deploy_test:
+#    needs: deploy_dev
+#    permissions:
+#      id-token: write
+#      contents: read
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
+#    with:
+#      artifact: ${{ needs.build.outputs.built_artifact }}
+#      version: ${{ needs.build.outputs.built_version }}
+#      environment: TEST
+#
+#  deploy_qa:
+#    needs: deploy_test
+#    permissions:
+#      id-token: write
+#      contents: read
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
+#    with:
+#      artifact: ${{ needs.build.outputs.built_artifact }}
+#      version: ${{ needs.build.outputs.built_version }}
+#      environment: QA

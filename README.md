@@ -1,6 +1,6 @@
 # Spring Boot Service Template
 
-This is a repository template for the deployment of a Spring Boot service in a GCP Cloud Run serverless instance. It is designed to be a reusable repository template for deploying a container-based web service using GitHub Actions.
+This is a repository template for deploying a Spring Boot service on a GCP Cloud Run serverless instance. It is designed to be a reusable repository template for deploying a container-based web service using GitHub Actions.
 
 The entire CI/CD tech stack is designed to utilize free, open-source tools, but it can be easily modified to use proprietary, licensed COTS tools.
 
@@ -12,10 +12,24 @@ The build phase of the delivery pipeline involves:
 2. Conducting Unit Tests (JUnit and Jacoco code coverage report)
 3. Conducting static code analysis (SpotBugs, PMD, Checkstyle)
 4. Conducting software composition analysis (OWASP Dependency Check)
+5. Building a Docker image of our Spring Boot web service and publishing it to our artifact repository.
 
 Running `mvn install site` will compile the JAR, build the container image, run all unit tests, perform static code analysis, and generate reports.
 
-Running `mvn deploy` will compile the JAR, build the container image, run all unit tests, perform static code analysis, and deploy the container image to the artifact repository via Jib, provided all tests and code analysis pass.
+Running `mvn deploy` will compile the JAR, build the container image, run all unit tests, build a Docker image, and publish the image to the artifact repository using the `artifactID` and `version` properties in the `pom.xml` file, provided all tests and code analysis pass. Note that the version is only maintained in <u>one</u> location: the `<version>`property in the `pom.xml` file. The version is accessible in the code, as can be evidenced in the `VersionController.java` file.
+
+## Deploy Phase
+
+After the build completes, the "deploy" phase is called to: 
+
+1. Retrieve the official artifact from the artifact repository.
+2. Deploy the retrieved artifact into the specified environment,
+3. Optionally, run system tests appropriate for the current environment,
+4. Optionally, recursively call the "deploy" for the next environment (dev -> test-> -> qa -> prod)
+
+Running the deployment workflow authenticates to the cloud service, retrieves the Docker image with the specified name and version, and deploys that image to the cloud platform. It also sets system properties that describe the deployment, allowing the deployed code to configure itself and operate correctly in that environment.
+
+The `Build` workflow can be configured to call deployments serially so that deployments (and tests) in lower environments must complete successfully before subsequent deployments to higher environments are attempted. The `build.yml` workflow file shows how that is possible.
 
 
 # Development Strategy
