@@ -16,5 +16,5 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # Optional: Add metadata for the image
-LABEL maintainer="Steve Cote <sdcote@gmail.com>"
+LABEL maintainer="Steve Cote <sdcote gmail com>"
 LABEL description="Spring Boot Profile Service with Swagger/OpenAPI"

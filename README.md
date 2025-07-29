@@ -25,7 +25,7 @@ After the build completes, the "deploy" phase is called to:
 1. Retrieve the official artifact from the artifact repository.
 2. Deploy the retrieved artifact into the specified environment,
 3. Optionally, run system tests appropriate for the current environment,
-4. Optionally, recursively call the "deploy" for the next environment (dev -> test-> -> qa -> prod)
+4. Optionally, call the "deploy" for the next environment (dev -> test-> -> qa -> prod)
 
 Running the deployment workflow authenticates to the cloud service, retrieves the Docker image with the specified name and version, and deploys that image to the cloud platform. It also sets system properties that describe the deployment, allowing the deployed code to configure itself and operate correctly in that environment.
 
